@@ -1,29 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Style Digital Clock</title>
-
+    <title>Neon Digital Clock</title>
     <style>
         body {
+            margin: 0;
+            height: 100vh;
             background: #000;
-            color: #00ffcc;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: "Poppins", sans-serif;
+            color: #00ffcc;
+        }
+
+        .clock-container {
+            text-align: center;
         }
 
         .clock {
             font-size: 80px;
-            padding: 20px 40px;
-            border: 2px solid #00ffcc;
-            border-radius: 15px;
-            box-shadow: 0 0 20px #00ffcc;
-            letter-spacing: 3px;
+            font-weight: bold;
+            text-shadow: 0 0 15px #00ffcc;
+        }
+
+        .date {
+            font-size: 24px;
+            margin-top: 10px;
+            color: #00ffee;
         }
 
         /* Settings Button */
@@ -31,22 +35,30 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 45px;
-            height: 45px;
+            background: transparent;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            background: #00ff00;
-            border: none;
+            border: 2px solid #00ffcc;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 8px #00ff00;
+            transition: 0.3s;
+            box-shadow: 0 0 12px #00ffcc;
+        }
+
+        .settings-btn:hover {
+            box-shadow: 0 0 18px #00ffcc;
+            transform: scale(1.08);
         }
 
         .settings-btn svg {
             width: 28px;
             height: 28px;
-            fill: #000;
+            stroke: #00ffcc;
+            fill: none;
+            stroke-width: 2;
         }
 
         /* Settings Panel */
@@ -54,160 +66,119 @@
             position: absolute;
             top: 80px;
             right: 20px;
-            width: 300px;
-            padding: 15px;
+            width: 280px;
             background: #111;
             border: 2px solid #00ffcc;
+            padding: 15px;
             border-radius: 10px;
             display: none;
-            max-height: 380px;
+            color: #00ffcc;
+            max-height: 350px;
             overflow-y: auto;
             box-shadow: 0 0 15px #00ffcc;
         }
 
-        .settings-panel input,
-        .settings-panel select {
+        .settings-panel label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .settings-panel select,
+        .settings-panel input {
             width: 100%;
             padding: 8px;
-            margin-top: 8px;
+            margin: 8px 0 15px 0;
             background: #222;
             color: #00ffcc;
             border: 1px solid #00ffcc;
             border-radius: 6px;
         }
 
-        optgroup {
-            color: #00ffaa;
-            font-weight: bold;
-            font-size: 14px;
-        }
     </style>
 </head>
+
 <body>
 
-    <button class="settings-btn" onclick="toggleSettings()">
-        <svg viewBox="0 0 24 24">
-            <path d="M12 8.5A3.5 3.5 0 1 1 8.5 12 3.5 3.5 0 0 1 12 8.5m0-6.5a1 1 0 0 1 1 1v1.07a8.14 8.14 0 0 1 2.12.88l.76-.76a1 1 0 0 1 1.41 0l1.42 1.42a1 1 0 0 1 0 1.41l-.76.76A8.14 8.14 0 0 1 20.93 11H22a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-1.07a8.14 8.14 0 0 1-.88 2.12l.76.76a1 1 0 0 1 0 1.41l-1.42 1.42a1 1 0 0 1-1.41 0l-.76-.76A8.14 8.14 0 0 1 13 20.93V22a1 1 0 0 1-2 0v-1.07a8.14 8.14 0 0 1-2.12-.88l-.76.76a1 1 0 0 1-1.41 0L3.29 19.39a1 1 0 0 1 0-1.41l.76-.76A8.14 8.14 0 0 1 4.07 15H3a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h1.07a8.14 8.14 0 0 1 .88-2.12l-.76-.76a1 1 0 0 1 0-1.41L5.61 3.29a1 1 0 0 1 1.41 0l.76.76A8.14 8.14 0 0 1 9 4.07V3a1 1 0 0 1 1-1z"/>
-        </svg>
-    </button>
+<button class="settings-btn" onclick="toggleSettings()">
+    <svg viewBox="0 0 24 24">
+        <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7zm7.94-2.51l-1.42-.83a6.97 6.97 0 0 0 0-2.32l1.42-.83a.5.5 0 0 0 .18-.68l-1.2-2.08a.5.5 0 0 0-.66-.19l-1.42.83a7.03 7.03 0 0 0-2.01-1.17V3.5a.5.5 0 0 0-.5-.5h-2.4a.5.5 0 0 0-.5.5v1.66a7.03 7.03 0 0 0-2.01 1.17l-1.42-.83a.5.5 0 0 0-.66.19L3.88 7.77a.5.5 0 0 0 .18.68l1.42.83a6.97 6.97 0 0 0 0 2.32l-1.42.83a.5.5 0 0 0-.18.68l1.2 2.08c.14.24.44.32.66.19l1.42-.83a7.03 7.03 0 0 0 2.01 1.17V20.5c0 .28.22.5.5.5h2.4c.28 0 .5-.22.5-.5v-1.66a7.03 7.03 0 0 0 2.01-1.17l1.42.83c.22.13.52.05.66-.19l1.2-2.08a.5.5 0 0 0-.18-.68z"/>
+    </svg>
+</button>
 
-    <div class="settings-panel" id="settingsPanel">
+<div class="settings-panel" id="settingsPanel">
+    <label>Time Zone (UTC + City)</label>
+    <select id="timezone" onchange="updateClock()"></select>
 
-        <label><b>Search Time Zone:</b></label>
-        <input type="text" id="timezoneSearch" placeholder="Search city or region..." onkeyup="filterZones()">
+    <label>Time Format</label>
+    <select id="format" onchange="updateClock()">
+        <option value="24">24-Hour</option>
+        <option value="12">12-Hour</option>
+    </select>
+</div>
 
-        <label><b>Time Zone (UTC + City):</b></label>
-        <select id="timezoneSelect" size="10"></select>
+<div class="clock-container">
+    <div class="clock" id="clock">00:00:00</div>
+    <div class="date" id="date"></div>
+</div>
 
-        <label><b>Time Format:</b></label>
-        <select id="formatSelect">
-            <option value="24">24-Hour</option>
-            <option value="12">12-Hour</option>
-        </select>
+<script>
+function toggleSettings() {
+    let panel = document.getElementById("settingsPanel");
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
+}
 
-    </div>
+const timezones = [
+    {zone: "Asia/Kolkata", utc: "UTC+05:30"},
+    {zone: "Asia/Dubai", utc: "UTC+04:00"},
+    {zone: "Asia/Tokyo", utc: "UTC+09:00"},
+    {zone: "Europe/London", utc: "UTC+00:00"},
+    {zone: "Europe/Paris", utc: "UTC+01:00"},
+    {zone: "America/New_York", utc: "UTC-04:00"},
+    {zone: "America/Chicago", utc: "UTC-05:00"},
+    {zone: "America/Los_Angeles", utc: "UTC-07:00"},
+    {zone: "Australia/Sydney", utc: "UTC+10:00"},
+];
 
-    <div class="clock" id="clock"></div>
+let tzSelect = document.getElementById("timezone");
+timezones.forEach(t => {
+    let opt = document.createElement("option");
+    opt.value = t.zone;
+    opt.textContent = `${t.utc} — ${t.zone}`;
+    tzSelect.appendChild(opt);
+});
+tzSelect.value = "Asia/Kolkata";
 
-    <script>
-        let groupedZones = {};
-        let flatZones = [];
+function updateClock() {
+    let tz = document.getElementById("timezone").value;
+    let format = document.getElementById("format").value;
 
-        function getUTCOffset(timeZone) {
-            const now = new Date();
-            const utc = new Date(now.toLocaleString("en-US", { timeZone: "UTC" }));
-            const local = new Date(now.toLocaleString("en-US", { timeZone }));
+    let now = new Date();
+    let options = {
+        timeZone: tz,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: format === "12"
+    };
 
-            let diff = (local - utc) / 3600000; 
-            let sign = diff >= 0 ? "+" : "-";
-            diff = Math.abs(diff);
+    document.getElementById("clock").textContent =
+        new Intl.DateTimeFormat('en-US', options).format(now);
 
-            let hours = Math.floor(diff);
-            let minutes = Math.round((diff - hours) * 60);
+    let dateOptions = {
+        timeZone: tz,
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
 
-            return `UTC${sign}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-        }
+    document.getElementById("date").textContent =
+        new Intl.DateTimeFormat('en-US', dateOptions).format(now);
+}
 
-        function loadSystemTimeZones() {
-            const zones = Intl.supportedValuesOf("timeZone");
-            flatZones = zones;
-
-            groupedZones = {};
-
-            zones.forEach(zone => {
-                const [region] = zone.split("/");
-
-                if (!groupedZones[region]) groupedZones[region] = [];
-                groupedZones[region].push(zone);
-            });
-
-            renderDropdown(zones);
-        }
-
-        function renderDropdown(list) {
-            const tzSelect = document.getElementById("timezoneSelect");
-            tzSelect.innerHTML = "";
-
-            for (let region in groupedZones) {
-                const optgroup = document.createElement("optgroup");
-                optgroup.label = region;
-
-                groupedZones[region]
-                    .filter(z => list.includes(z))
-                    .forEach(zone => {
-                        const opt = document.createElement("option");
-                        const offset = getUTCOffset(zone);
-
-                        opt.value = zone;
-                        opt.textContent = `${offset} → ${zone.replace("/", " → ")}`;
-
-                        optgroup.appendChild(opt);
-                    });
-
-                tzSelect.appendChild(optgroup);
-            }
-        }
-
-        function filterZones() {
-            const text = document.getElementById("timezoneSearch").value.toLowerCase();
-            const filtered = flatZones.filter(z => z.toLowerCase().includes(text));
-            renderDropdown(filtered);
-        }
-
-        function toggleSettings() {
-            const panel = document.getElementById("settingsPanel");
-            panel.style.display = panel.style.display === "block" ? "none" : "block";
-        }
-
-        function updateClock() {
-            const tz = document.getElementById("timezoneSelect").value;
-            const format = document.getElementById("formatSelect").value;
-
-            let now = tz
-                ? new Date(new Date().toLocaleString("en-US", { timeZone: tz }))
-                : new Date();
-
-            let h = now.getHours();
-            let m = now.getMinutes();
-            let s = now.getSeconds();
-
-            let period = "";
-            if (format === "12") {
-                period = h >= 12 ? " PM" : " AM";
-                h = h % 12 || 12;
-            }
-
-            h = h < 10 ? "0" + h : h;
-            m = m < 10 ? "0" + m : m;
-            s = s < 10 ? "0" + s : s;
-
-            document.getElementById("clock").textContent = `${h}:${m}:${s}${period}`;
-        }
-
-        loadSystemTimeZones();
-        setInterval(updateClock, 1000);
-        updateClock();
-    </script>
+setInterval(updateClock, 1000);
+updateClock();
+</script>
 
 </body>
 </html>
