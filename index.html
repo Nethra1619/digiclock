@@ -6,12 +6,16 @@
         body {
             margin: 0;
             height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             background: #000;
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             color: #00ffcc;
+            transition: background 0.5s;
         }
 
         .clock-container {
@@ -30,11 +34,11 @@
             color: #00ffee;
         }
 
-        /* Settings Button */
+        /* Gear Icon */
         .settings-btn {
             position: absolute;
             top: 20px;
-            right: 20px;
+            left: 20px;
             background: transparent;
             width: 50px;
             height: 50px;
@@ -48,11 +52,6 @@
             box-shadow: 0 0 12px #00ffcc;
         }
 
-        .settings-btn:hover {
-            box-shadow: 0 0 18px #00ffcc;
-            transform: scale(1.08);
-        }
-
         .settings-btn svg {
             width: 28px;
             height: 28px;
@@ -61,117 +60,129 @@
             stroke-width: 2;
         }
 
-        /* Settings Panel */
-        .settings-panel {
+        /* Menu Box */
+        .menu-panel {
             position: absolute;
             top: 80px;
-            right: 20px;
-            width: 280px;
+            left: 20px;
+            width: 200px;
             background: #111;
             border: 2px solid #00ffcc;
             padding: 15px;
             border-radius: 10px;
             display: none;
             color: #00ffcc;
-            max-height: 350px;
-            overflow-y: auto;
             box-shadow: 0 0 15px #00ffcc;
         }
 
-        .settings-panel label {
-            font-size: 14px;
-            font-weight: bold;
+        .menu-panel div {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #00ffcc;
         }
 
-        .settings-panel select,
-        .settings-panel input {
-            width: 100%;
-            padding: 8px;
-            margin: 8px 0 15px 0;
-            background: #222;
+        .menu-panel div:last-child {
+            border-bottom: none;
+        }
+
+        .menu-panel div:hover {
+            background: #00ffcc33;
+        }
+
+        /* Theme Selector */
+        .theme-panel {
+            position: absolute;
+            top: 80px;
+            left: 240px;
+            width: 250px;
+            background: #111;
+            border: 2px solid #00ffcc;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
             color: #00ffcc;
-            border: 1px solid #00ffcc;
-            border-radius: 6px;
+            box-shadow: 0 0 15px #00ffcc;
         }
 
+        .theme-panel img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .theme-panel img:hover {
+            border-color: #00ffcc;
+            box-shadow: 0 0 10px #00ffcc;
+        }
     </style>
 </head>
 
 <body>
 
-<button class="settings-btn" onclick="toggleSettings()">
+<button class="settings-btn" onclick="toggleMenu()">
     <svg viewBox="0 0 24 24">
         <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7zm7.94-2.51l-1.42-.83a6.97 6.97 0 0 0 0-2.32l1.42-.83a.5.5 0 0 0 .18-.68l-1.2-2.08a.5.5 0 0 0-.66-.19l-1.42.83a7.03 7.03 0 0 0-2.01-1.17V3.5a.5.5 0 0 0-.5-.5h-2.4a.5.5 0 0 0-.5.5v1.66a7.03 7.03 0 0 0-2.01 1.17l-1.42-.83a.5.5 0 0 0-.66.19L3.88 7.77a.5.5 0 0 0 .18.68l1.42.83a6.97 6.97 0 0 0 0 2.32l-1.42.83a.5.5 0 0 0-.18.68l1.2 2.08c.14.24.44.32.66.19l1.42-.83a7.03 7.03 0 0 0 2.01 1.17V20.5c0 .28.22.5.5.5h2.4c.28 0 .5-.22.5-.5v-1.66a7.03 7.03 0 0 0 2.01-1.17l1.42.83c.22.13.52.05.66-.19l1.2-2.08a.5.5 0 0 0-.18-.68z"/>
     </svg>
 </button>
 
-<div class="settings-panel" id="settingsPanel">
-    <label>Time Zone (UTC + City)</label>
-    <select id="timezone" onchange="updateClock()"></select>
-
-    <label>Time Format</label>
-    <select id="format" onchange="updateClock()">
-        <option value="24">24-Hour</option>
-        <option value="12">12-Hour</option>
-    </select>
+<!-- Menu Panel -->
+<div class="menu-panel" id="menuPanel">
+    <div onclick="goTo('stopwatch.html')">⏱ Stopwatch</div>
+    <div onclick="goTo('timer.html')">⏳ Timer</div>
+    <div onclick="toggleTheme()">🎨 Themes</div>
 </div>
 
+<!-- Theme Panel -->
+<div class="theme-panel" id="themePanel">
+    <img src="theme1.jpg" onclick="changeTheme(this.src)">
+    <img src="theme2.jpg" onclick="changeTheme(this.src)">
+    <img src="theme3.jpg" onclick="changeTheme(this.src)">
+</div>
+
+<!-- Clock -->
 <div class="clock-container">
     <div class="clock" id="clock">00:00:00</div>
     <div class="date" id="date"></div>
 </div>
 
 <script>
-function toggleSettings() {
-    let panel = document.getElementById("settingsPanel");
+
+function toggleMenu() {
+    let menu = document.getElementById("menuPanel");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+function goTo(page) {
+    window.location.href = page;
+}
+
+function toggleTheme() {
+    let panel = document.getElementById("themePanel");
     panel.style.display = panel.style.display === "block" ? "none" : "block";
 }
 
-const timezones = [
-    {zone: "Asia/Kolkata", utc: "UTC+05:30"},
-    {zone: "Asia/Dubai", utc: "UTC+04:00"},
-    {zone: "Asia/Tokyo", utc: "UTC+09:00"},
-    {zone: "Europe/London", utc: "UTC+00:00"},
-    {zone: "Europe/Paris", utc: "UTC+01:00"},
-    {zone: "America/New_York", utc: "UTC-04:00"},
-    {zone: "America/Chicago", utc: "UTC-05:00"},
-    {zone: "America/Los_Angeles", utc: "UTC-07:00"},
-    {zone: "Australia/Sydney", utc: "UTC+10:00"},
-];
-
-let tzSelect = document.getElementById("timezone");
-timezones.forEach(t => {
-    let opt = document.createElement("option");
-    opt.value = t.zone;
-    opt.textContent = `${t.utc} — ${t.zone}`;
-    tzSelect.appendChild(opt);
-});
-tzSelect.value = "Asia/Kolkata";
+function changeTheme(imgSrc) {
+    document.body.style.backgroundImage = `url('${imgSrc}')`;
+}
 
 function updateClock() {
-    let tz = document.getElementById("timezone").value;
-    let format = document.getElementById("format").value;
-
     let now = new Date();
     let options = {
-        timeZone: tz,
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
-        hour12: format === "12"
+        second: '2-digit'
     };
-
     document.getElementById("clock").textContent =
         new Intl.DateTimeFormat('en-US', options).format(now);
 
     let dateOptions = {
-        timeZone: tz,
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     };
-
     document.getElementById("date").textContent =
         new Intl.DateTimeFormat('en-US', dateOptions).format(now);
 }
