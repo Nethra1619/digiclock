@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Clock with Searchable Time Zones</title>
+    <title>System Style Digital Clock</title>
 
     <style>
         body {
@@ -19,23 +19,22 @@
 
         .clock {
             font-size: 80px;
-            letter-spacing: 3px;
             padding: 20px 40px;
             border: 2px solid #00ffcc;
             border-radius: 15px;
             box-shadow: 0 0 20px #00ffcc;
+            letter-spacing: 3px;
         }
 
-        /* Settings icon button */
         .settings-btn {
             position: absolute;
             top: 20px;
             right: 20px;
             background: #00ff00;
             color: #000;
-            font-size: 22px;
             width: 45px;
             height: 45px;
+            font-size: 22px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
@@ -45,19 +44,17 @@
             box-shadow: 0 0 10px #00ff00;
         }
 
-        /* Settings panel */
         .settings-panel {
             position: absolute;
             top: 80px;
             right: 20px;
-            width: 260px;
+            width: 300px;
+            padding: 15px;
             background: #111;
             border: 2px solid #00ffcc;
-            padding: 15px;
             border-radius: 10px;
             display: none;
-            color: #00ffcc;
-            max-height: 350px;
+            max-height: 380px;
             overflow-y: auto;
             box-shadow: 0 0 15px #00ffcc;
         }
@@ -67,82 +64,103 @@
             width: 100%;
             padding: 8px;
             margin-top: 8px;
-            margin-bottom: 15px;
             background: #222;
             color: #00ffcc;
             border: 1px solid #00ffcc;
             border-radius: 6px;
         }
 
+        optgroup {
+            color: #00ffaa;
+            font-weight: bold;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Green circular icon -->
     <button class="settings-btn" onclick="toggleSettings()">⚙</button>
 
     <div class="settings-panel" id="settingsPanel">
+
         <label><b>Search Time Zone:</b></label>
-        <input type="text" id="timezoneSearch" placeholder="Type country (ex: I)" onkeyup="filterZones()">
+        <input type="text" id="timezoneSearch" placeholder="Search city or region..." onkeyup="filterZones()">
 
-        <label>Time Zone:</label>
-        <select id="timezoneSelect" size="8"></select>
+        <label><b>Time Zone (System Style):</b></label>
+        <select id="timezoneSelect" size="10"></select>
 
-        <label>Time Format:</label>
+        <label><b>Time Format:</b></label>
         <select id="formatSelect">
             <option value="24">24-Hour</option>
             <option value="12">12-Hour</option>
         </select>
+
     </div>
 
     <div class="clock" id="clock"></div>
 
+
     <script>
-        let allZones = [];
+        let groupedZones = {};
+        let flatZones = [];
+        let defaultTZ = "Asia/Kolkata";  // ★ Default timezone (Chennai/Kolkata/New Delhi)
 
-        function loadTimeZones() {
-            const tzSelect = document.getElementById("timezoneSelect");
+        function loadSystemTimeZones() {
+            const zones = Intl.supportedValuesOf("timeZone");
+            flatZones = zones;
 
-            // Local Time option
-            const localOption = document.createElement("option");
-            localOption.value = "local";
-            localOption.textContent = "Local Time";
-            tzSelect.appendChild(localOption);
+            groupedZones = {};
 
-            allZones = Intl.supportedValuesOf("timeZone");
+            zones.forEach(zone => {
+                const [region, city] = zone.split("/");
 
-            allZones.forEach(zone => {
-                const opt = document.createElement("option");
-                opt.value = zone;
-                opt.textContent = zone;
-                tzSelect.appendChild(opt);
+                if (!groupedZones[region]) {
+                    groupedZones[region] = [];
+                }
+
+                groupedZones[region].push(zone);
             });
+
+            renderDropdown(zones);
+
+            // ★ Auto-select India zone (Asia/Kolkata)
+            const tzSelect = document.getElementById("timezoneSelect");
+            tzSelect.value = defaultTZ;
         }
 
-        loadTimeZones();
-
-        // Filter zones based on user input
-        function filterZones() {
-            const searchValue = document.getElementById("timezoneSearch").value.toLowerCase();
+        function renderDropdown(list) {
             const tzSelect = document.getElementById("timezoneSelect");
+            tzSelect.innerHTML = "";
 
-            tzSelect.innerHTML = ""; 
+            for (let region in groupedZones) {
+                const optgroup = document.createElement("optgroup");
+                optgroup.label = region;
 
-            if ("local".includes(searchValue)) {
-                const localOption = document.createElement("option");
-                localOption.value = "local";
-                localOption.textContent = "Local Time";
-                tzSelect.appendChild(localOption);
+                groupedZones[region]
+                    .filter(z => list.includes(z))
+                    .forEach(zone => {
+                        const opt = document.createElement("option");
+                        opt.value = zone;
+
+                        // ★ Make India visible clearly
+                        opt.textContent = zone === "Asia/Kolkata"
+                            ? "Asia → Kolkata (Chennai / Delhi / Mumbai)"
+                            : zone.replace("/", " → ");
+
+                        tzSelect.appendChild(opt);
+                        optgroup.appendChild(opt);
+                    });
+
+                tzSelect.appendChild(optgroup);
             }
+        }
 
-            allZones.forEach(zone => {
-                if (zone.toLowerCase().includes(searchValue)) {
-                    const opt = document.createElement("option");
-                    opt.value = zone;
-                    opt.textContent = zone;
-                    tzSelect.appendChild(opt);
-                }
-            });
+        function filterZones() {
+            const text = document.getElementById("timezoneSearch").value.toLowerCase();
+
+            const filtered = flatZones.filter(z => z.toLowerCase().includes(text));
+
+            renderDropdown(filtered);
         }
 
         function toggleSettings() {
@@ -151,12 +169,10 @@
         }
 
         function updateClock() {
-            const timezone = document.getElementById("timezoneSelect").value;
+            const tz = document.getElementById("timezoneSelect").value || defaultTZ;
             const format = document.getElementById("formatSelect").value;
 
-            let now = timezone === "local"
-                ? new Date()
-                : new Date(new Date().toLocaleString("en-US", { timeZone: timezone }));
+            let now = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
 
             let h = now.getHours();
             let m = now.getMinutes();
@@ -175,6 +191,7 @@
             document.getElementById("clock").textContent = `${h}:${m}:${s}${period}`;
         }
 
+        loadSystemTimeZones();
         setInterval(updateClock, 1000);
         updateClock();
     </script>
