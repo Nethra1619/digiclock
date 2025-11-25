@@ -54,12 +54,9 @@
             border: 2px solid #00ffcc;
             border-radius: 10px;
             display: none;
-            max-height: 380px;
-            overflow-y: auto;
             box-shadow: 0 0 15px #00ffcc;
         }
 
-        .settings-panel input,
         .settings-panel select {
             width: 100%;
             padding: 8px;
@@ -70,11 +67,6 @@
             border-radius: 6px;
         }
 
-        optgroup {
-            color: #00ffaa;
-            font-weight: bold;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
@@ -82,12 +74,6 @@
     <button class="settings-btn" onclick="toggleSettings()">⚙</button>
 
     <div class="settings-panel" id="settingsPanel">
-
-        <label><b>Search Time Zone:</b></label>
-        <input type="text" id="timezoneSearch" placeholder="Search city or region..." onkeyup="filterZones()">
-
-        <label><b>Time Zone (System Style):</b></label>
-        <select id="timezoneSelect" size="10"></select>
 
         <label><b>Time Format:</b></label>
         <select id="formatSelect">
@@ -99,78 +85,17 @@
 
     <div class="clock" id="clock"></div>
 
-
     <script>
-        let groupedZones = {};
-        let flatZones = [];
-        let defaultTZ = "Asia/Kolkata";  // ★ Default timezone (Chennai/Kolkata/New Delhi)
-
-        function loadSystemTimeZones() {
-            const zones = Intl.supportedValuesOf("timeZone");
-            flatZones = zones;
-
-            groupedZones = {};
-
-            zones.forEach(zone => {
-                const [region, city] = zone.split("/");
-
-                if (!groupedZones[region]) {
-                    groupedZones[region] = [];
-                }
-
-                groupedZones[region].push(zone);
-            });
-
-            renderDropdown(zones);
-
-            // ★ Auto-select India zone (Asia/Kolkata)
-            const tzSelect = document.getElementById("timezoneSelect");
-            tzSelect.value = defaultTZ;
-        }
-
-        function renderDropdown(list) {
-            const tzSelect = document.getElementById("timezoneSelect");
-            tzSelect.innerHTML = "";
-
-            for (let region in groupedZones) {
-                const optgroup = document.createElement("optgroup");
-                optgroup.label = region;
-
-                groupedZones[region]
-                    .filter(z => list.includes(z))
-                    .forEach(zone => {
-                        const opt = document.createElement("option");
-                        opt.value = zone;
-
-                        // ★ Make India visible clearly
-                        opt.textContent = zone === "Asia/Kolkata"
-                            ? "Asia → Kolkata (Chennai / Delhi / Mumbai)"
-                            : zone.replace("/", " → ");
-
-                        tzSelect.appendChild(opt);
-                        optgroup.appendChild(opt);
-                    });
-
-                tzSelect.appendChild(optgroup);
-            }
-        }
-
-        function filterZones() {
-            const text = document.getElementById("timezoneSearch").value.toLowerCase();
-
-            const filtered = flatZones.filter(z => z.toLowerCase().includes(text));
-
-            renderDropdown(filtered);
-        }
-
         function toggleSettings() {
             const panel = document.getElementById("settingsPanel");
             panel.style.display = panel.style.display === "block" ? "none" : "block";
         }
 
         function updateClock() {
-            const tz = document.getElementById("timezoneSelect").value || defaultTZ;
             const format = document.getElementById("formatSelect").value;
+
+            // FIXED TIMEZONE → IST (Chennai/Kolkata/New Delhi)
+            const tz = "Asia/Kolkata";
 
             let now = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
 
@@ -191,7 +116,6 @@
             document.getElementById("clock").textContent = `${h}:${m}:${s}${period}`;
         }
 
-        loadSystemTimeZones();
         setInterval(updateClock, 1000);
         updateClock();
     </script>
