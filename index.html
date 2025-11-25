@@ -7,16 +7,17 @@
             margin: 0;
             height: 100vh;
             background: #000;
-            background-size: cover;
-            background-position: center;
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             color: #00ffcc;
+            overflow: hidden;
         }
 
-        .clock-container { text-align: center; }
+        .clock-container {
+            text-align: center;
+        }
 
         .clock {
             font-size: 80px;
@@ -30,8 +31,8 @@
             color: #00ffee;
         }
 
-        /* RIGHT SIDE SETTINGS (Time Zone & Format) */
-        .settings-btn-right {
+        /* ---------------- TOP RIGHT SETTINGS BUTTON ---------------- */
+        .settings-btn {
             position: absolute;
             top: 20px;
             right: 20px;
@@ -44,18 +45,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 12px #00ffcc;
             transition: 0.3s;
+            box-shadow: 0 0 12px #00ffcc;
         }
 
-        .settings-btn-right:hover,
-        .settings-btn-left:hover {
-            transform: scale(1.08);
+        .settings-btn:hover {
             box-shadow: 0 0 18px #00ffcc;
+            transform: scale(1.08);
         }
 
-        .settings-btn-right svg,
-        .settings-btn-left svg {
+        .settings-btn svg {
             width: 28px;
             height: 28px;
             stroke: #00ffcc;
@@ -63,26 +62,8 @@
             stroke-width: 2;
         }
 
-        /* LEFT MENU BUTTON */
-        .settings-btn-left {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: transparent;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid #00ffcc;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 12px #00ffcc;
-            transition: 0.3s;
-        }
-
-        /* RIGHT PANEL (Time zone & format) */
-        .settings-panel-right {
+        /* ---------------- TOP RIGHT SETTINGS PANEL ---------------- */
+        .settings-panel {
             position: absolute;
             top: 80px;
             right: 20px;
@@ -98,48 +79,12 @@
             box-shadow: 0 0 15px #00ffcc;
         }
 
-        /* LEFT PANEL (Stopwatch, Timer, Theme) */
-        .settings-panel-left {
-            position: absolute;
-            top: 80px;
-            left: 20px;
-            width: 260px;
-            background: #111;
-            border: 2px solid #00ffcc;
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
-            color: #00ffcc;
-            box-shadow: 0 0 15px #00ffcc;
+        .settings-panel label {
+            font-size: 14px;
+            font-weight: bold;
         }
 
-        .settings-panel-left button {
-            width: 100%;
-            padding: 10px;
-            background: #00ffcc22;
-            border: 1px solid #00ffcc;
-            color: #00ffcc;
-            border-radius: 6px;
-            margin-top: 10px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .theme-img {
-            width: 100%;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-top: 10px;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .theme-img:hover {
-            border: 2px solid #00ffcc;
-        }
-
-        select, input {
+        .settings-panel select {
             width: 100%;
             padding: 8px;
             margin: 8px 0 15px 0;
@@ -148,113 +93,219 @@
             border: 1px solid #00ffcc;
             border-radius: 6px;
         }
+
+        /* ---------------- LEFT SIDE NAV BUTTON ---------------- */
+        .left-gear {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #00ffcc;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.3s;
+            box-shadow: 0 0 12px #00ffcc;
+        }
+
+        .left-gear svg {
+            width: 30px;
+            height: 30px;
+            stroke: #00ffcc;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* ---------------- LEFT PANEL TABS ---------------- */
+        .left-panel {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            width: 300px;
+            background: #111;
+            border: 2px solid #00ffcc;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            color: #00ffcc;
+            box-shadow: 0 0 15px #00ffcc;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .tab-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #00ffcc;
+            background: transparent;
+            color: #00ffcc;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background: #00ffcc22;
+        }
+
+        /* --------------- THEME GRID (2-COLUMN) --------------- */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .theme-item {
+            width: 100%;
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            border: 2px solid #00ffcc;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 10px #00ffcc44;
+        }
+
+        .theme-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00ffcc;
+        }
     </style>
 </head>
 
 <body>
 
-<!-- LEFT SETTINGS BUTTON -->
-<button class="settings-btn-left" onclick="toggleLeftPanel()">
+<!-- ---------------- TOP RIGHT SETTINGS BUTTON ---------------- -->
+<button class="settings-btn" onclick="toggleSettings()">
     <svg viewBox="0 0 24 24">
         <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7zm7.94-2.51l-1.42-.83a6.97 6.97 0 0 0 0-2.32l1.42-.83a.5.5 0 0 0 .18-.68l-1.2-2.08a.5.5 0 0 0-.66-.19l-1.42.83a7.03 7.03 0 0 0-2.01-1.17V3.5a.5.5 0 0 0-.5-.5h-2.4a.5.5 0 0 0-.5.5v1.66a7.03 7.03 0 0 0-2.01 1.17l-1.42-.83a.5.5 0 0 0-.66.19L3.88 7.77a.5.5 0 0 0 .18.68l1.42.83a6.97 6.97 0 0 0 0 2.32l-1.42.83a.5.5 0 0 0-.18.68l1.2 2.08c.14.24.44.32.66.19l1.42-.83a7.03 7.03 0 0 0 2.01 1.17V20.5c0 .28.22.5.5.5h2.4c.28 0 .5-.22.5-.5v-1.66a7.03 7.03 0 0 0 2.01-1.17l1.42.83c.22.13.52.05.66-.19l1.2-2.08a.5.5 0 0 0-.18-.68z"/>
     </svg>
 </button>
 
-<!-- RIGHT SETTINGS BUTTON -->
-<button class="settings-btn-right" onclick="toggleRightPanel()">
-    <svg viewBox="0 0 24 24">
-        <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7zm7.94-2.51l-1.42-.83a6.97 6.97 0 0 0 0-2.32l1.42-.83a.5.5 0 0 0 .18-.68l-1.2-2.08a.5.5 0 0 0-.66-.19l-1.42.83a7.03 7.03 0 0 0-2.01-1.17V3.5a.5.5 0 0 0-.5-.5h-2.4a.5.5 0 0 0-.5.5v1.66a7.03 7.03 0 0 0-2.01 1.17l-1.42-.83a.5.5 0 0 0-.66.19L3.88 7.77a.5.5 0 0 0 .18.68l1.42.83a6.97 6.97 0 0 0 0 2.32l-1.42.83a.5.5 0 0 0-.18.68l1.2 2.08c.14.24.44.32.66.19l1.42-.83a7.03 7.03 0 0 0 2.01 1.17V20.5c0 .28.22.5.5.5h2.4c.28 0 .5-.22.5-.5v-1.66a7.03 7.03 0 0 0 2.01-1.17l1.42.83c.22.13.52.05.66-.19l1.2-2.08a.5.5 0 0 0-.18-.68z"/>
-    </svg>
-</button>
-
-<!-- LEFT PANEL -->
-<div class="settings-panel-left" id="leftPanel">
-    <button onclick="location.href='stopwatch.html'">Stopwatch</button>
-    <button onclick="location.href='timer.html'">Timer</button>
-
-    <h3>Select Theme</h3>
-
-    <img src="nature1.webp" class="theme-img" onclick="changeTheme('nature1.webp')">
-    <img src="nature2.jpg" class="theme-img" onclick="changeTheme('nature2'.jpg')">
-    <img src="nat3.jpg" class="theme-img" onclick="changeTheme('nat3.jpg')">
-    <img src="nat4.jfif" class="theme-img" onclick="changeTheme('nat4.jfif')">
-    <img src="nat5.jpg" class="theme-img" onclick="changeTheme('nat5.jpg')">
-    <img src="nat6.jpg" class="theme-img" onclick="changeTheme('nat6.jpg')">
-</div>
-
-<!-- RIGHT PANEL -->
-<div class="settings-panel-right" id="rightPanel">
-    <label>Time Zone</label>
+<!-- ---------------- SETTINGS PANEL (RIGHT) ---------------- -->
+<div class="settings-panel" id="settingsPanel">
+    <label>Time Zone (UTC)</label>
     <select id="timezone" onchange="updateClock()"></select>
 
-    <label>Clock Format</label>
+    <label>Time Format</label>
     <select id="format" onchange="updateClock()">
         <option value="24">24-Hour</option>
         <option value="12">12-Hour</option>
     </select>
 </div>
 
-<!-- CLOCK -->
+<!-- ---------------- LEFT SIDE NAV BUTTON ---------------- -->
+<button class="left-gear" onclick="toggleLeftPanel()">
+    <svg viewBox="0 0 24 24">
+        <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z"/>
+    </svg>
+</button>
+
+<!-- ---------------- LEFT PANEL TABS ---------------- -->
+<div class="left-panel" id="leftPanel">
+
+    <button class="tab-btn" onclick="window.location.href='stopwatch.html'">Stopwatch</button>
+    <button class="tab-btn" onclick="window.location.href='timer.html'">Timer</button>
+
+    <h3>Select Theme</h3>
+
+    <div class="theme-grid">
+        <div class="theme-item" style="background-image: url('nature1.webp')" onclick="setTheme('nature1.webp')"></div>
+        <div class="theme-item" style="background-image: url('nature2.jpg')" onclick="setTheme('nature2.jpg')"></div>
+
+        <div class="theme-item" style="background-image: url('nat3.jpg')" onclick="setTheme('nat3.jpg')"></div>
+        <div class="theme-item" style="background-image: url('nat4.jfif')" onclick="setTheme('nat4.jfif')"></div>
+
+        <div class="theme-item" style="background-image: url('nat5.jpg')" onclick="setTheme('nat5.jpg')"></div>
+        <div class="theme-item" style="background-image: url('nat6.jpg')" onclick="setTheme('nat6.jpg')"></div>
+    </div>
+</div>
+
+<!-- ---------------- MAIN CLOCK ---------------- -->
 <div class="clock-container">
     <div class="clock" id="clock">00:00:00</div>
     <div class="date" id="date"></div>
 </div>
 
 <script>
-function toggleRightPanel() {
-    document.getElementById("rightPanel").style.display =
-        document.getElementById("rightPanel").style.display === "block" ? "none" : "block";
+function toggleSettings() {
+    let panel = document.getElementById("settingsPanel");
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
 }
 
 function toggleLeftPanel() {
-    document.getElementById("leftPanel").style.display =
-        document.getElementById("leftPanel").style.display === "block" ? "none" : "block";
+    let panel = document.getElementById("leftPanel");
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
 }
 
-/* THEME FUNCTION */
-function changeTheme(img) {
-    document.body.style.backgroundImage = `url('${img}')`;
-}
+/* ---------------- UTC TIME ZONES ---------------- */
+const timezones = [
+    {zone: "UTC", utc: "UTC+00:00"},
+    {zone: "Asia/Kolkata", utc: "UTC+05:30"},
+    {zone: "Asia/Dubai", utc: "UTC+04:00"},
+    {zone: "Asia/Tokyo", utc: "UTC+09:00"},
+    {zone: "Europe/London", utc: "UTC+00:00"},
+    {zone: "Europe/Paris", utc: "UTC+01:00"},
+    {zone: "America/New_York", utc: "UTC-04:00"},
+    {zone: "America/Chicago", utc: "UTC-05:00"},
+    {zone: "America/Los_Angeles", utc: "UTC-07:00"},
+    {zone: "Australia/Sydney", utc: "UTC+10:00"},
+];
 
-/* TIME ZONE LIST */
-const timezones = Intl.supportedValuesOf('timeZone');
 let tzSelect = document.getElementById("timezone");
-
-timezones.forEach(tz => {
+timezones.forEach(t => {
     let opt = document.createElement("option");
-    opt.value = tz;
-    opt.textContent = tz;
+    opt.value = t.zone;
+    opt.textContent = `${t.utc} — ${t.zone}`;
     tzSelect.appendChild(opt);
 });
-
 tzSelect.value = "Asia/Kolkata";
 
+/* ---------------- CLOCK UPDATE ---------------- */
 function updateClock() {
     let tz = document.getElementById("timezone").value;
     let format = document.getElementById("format").value;
+
     let now = new Date();
+    let options = {
+        timeZone: tz,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: format === "12"
+    };
 
     document.getElementById("clock").textContent =
-        new Intl.DateTimeFormat("en-US", {
-            timeZone: tz,
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: format === "12"
-        }).format(now);
+        new Intl.DateTimeFormat('en-US', options).format(now);
+
+    let dateOptions = {
+        timeZone: tz,
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
 
     document.getElementById("date").textContent =
-        new Intl.DateTimeFormat("en-US", {
-            timeZone: tz,
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-        }).format(now);
+        new Intl.DateTimeFormat('en-US', dateOptions).format(now);
 }
 
 setInterval(updateClock, 1000);
 updateClock();
+
+/* ---------------- SET BACKGROUND THEME ---------------- */
+function setTheme(img) {
+    document.body.style.background = `url('${img}') center/cover fixed`;
+}
 </script>
 
 </body>
