@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Clock with Settings</title>
+    <title>Digital Clock with All Time Zones</title>
     <style>
         body {
             background: #000;
@@ -45,14 +45,15 @@
             position: absolute;
             top: 70px;
             right: 20px;
-            width: 250px;
+            width: 260px;
             background: #111;
             border: 2px solid #00ffcc;
             padding: 15px;
             border-radius: 10px;
             display: none;
             color: #00ffcc;
-            box-shadow: 0 0 15px #00ffcc;
+            max-height: 350px;
+            overflow-y: auto;
         }
 
         .settings-panel select {
@@ -65,6 +66,7 @@
             border: 1px solid #00ffcc;
             border-radius: 6px;
         }
+
     </style>
 </head>
 <body>
@@ -73,14 +75,7 @@
 
     <div class="settings-panel" id="settingsPanel">
         <label>Time Zone:</label>
-        <select id="timezoneSelect">
-            <option value="local">Local Time</option>
-            <option value="Asia/Kolkata">Asia / Kolkata</option>
-            <option value="America/New_York">America / New York</option>
-            <option value="Europe/London">Europe / London</option>
-            <option value="Asia/Dubai">Asia / Dubai</option>
-            <option value="Asia/Tokyo">Asia / Tokyo</option>
-        </select>
+        <select id="timezoneSelect"></select>
 
         <label>Time Format:</label>
         <select id="formatSelect">
@@ -92,6 +87,29 @@
     <div class="clock" id="clock"></div>
 
     <script>
+        // Load all time zones automatically
+        function loadTimeZones() {
+            const tzSelect = document.getElementById("timezoneSelect");
+
+            // Add Local Time option
+            const localOption = document.createElement("option");
+            localOption.value = "local";
+            localOption.textContent = "Local Time";
+            tzSelect.appendChild(localOption);
+
+            // Load all IANA time zones
+            const zones = Intl.supportedValuesOf("timeZone");
+
+            zones.forEach(zone => {
+                const opt = document.createElement("option");
+                opt.value = zone;
+                opt.textContent = zone;
+                tzSelect.appendChild(opt);
+            });
+        }
+
+        loadTimeZones();
+
         function toggleSettings() {
             const panel = document.getElementById("settingsPanel");
             panel.style.display = panel.style.display === "block" ? "none" : "block";
@@ -101,14 +119,13 @@
             const timezone = document.getElementById("timezoneSelect").value;
             const format = document.getElementById("formatSelect").value;
 
-            let now = timezone === "local" 
-                ? new Date() 
+            let now = timezone === "local"
+                ? new Date()
                 : new Date(new Date().toLocaleString("en-US", { timeZone: timezone }));
 
             let h = now.getHours();
             let m = now.getMinutes();
             let s = now.getSeconds();
-
             let period = "";
 
             if (format === "12") {
