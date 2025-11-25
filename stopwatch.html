@@ -1,65 +1,147 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Stopwatch</title>
+    <title>Neon Stopwatch</title>
     <style>
         body {
+            margin: 0;
+            height: 100vh;
             background: #000;
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
             color: #00ffcc;
-            font-family: Arial;
-            text-align: center;
-            margin-top: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        .container { text-align: center; }
+
         .time {
             font-size: 70px;
-            text-shadow: 0 0 20px #00ffcc;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 18px #00ffcc;
         }
-        button {
-            padding: 10px 30px;
+
+        .btn {
+            padding: 12px 22px;
             margin: 10px;
-            background: #00ffcc;
-            border: none;
-            border-radius: 8px;
+            background: #00ffcc22;
+            border: 2px solid #00ffcc;
+            color: #00ffcc;
+            font-size: 18px;
+            border-radius: 10px;
             cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #00ffcc;
+            color: #000;
+            box-shadow: 0 0 18px #00ffcc;
+        }
+
+        .laps {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #00ffcc;
+            padding: 10px;
+            border-radius: 10px;
+            background: #00101055;
+        }
+
+        .lap-item {
+            padding: 5px;
+            border-bottom: 1px solid #00ffcc44;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #00ffcc;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 12px #00ffcc;
+        }
+
+        .back-btn svg {
+            width: 28px;
+            height: 28px;
+            stroke: #00ffcc;
+            fill: none;
+            stroke-width: 2;
         }
     </style>
 </head>
+
 <body>
 
-<h1>⏱ Stopwatch</h1>
-<div class="time" id="display">00:00:00</div>
+<!-- Back Button -->
+<button class="back-btn" onclick="location.href='index.html'">
+    <svg viewBox="0 0 24 24">
+        <path d="M15 18l-6-6 6-6"/>
+    </svg>
+</button>
 
-<button onclick="start()">Start</button>
-<button onclick="stop()">Stop</button>
-<button onclick="reset()">Reset</button>
+<div class="container">
+    <div class="time" id="display">00:00:00.00</div>
+
+    <button class="btn" onclick="start()">Start</button>
+    <button class="btn" onclick="pause()">Pause</button>
+    <button class="btn" onclick="reset()">Reset</button>
+    <button class="btn" onclick="lap()">Lap</button>
+
+    <div class="laps" id="laps"></div>
+</div>
 
 <script>
-let ms = 0, sec = 0, min = 0;
-let timer;
+let ms = 0, sec = 0, min = 0, hr = 0;
+let interval;
+
+function updateDisplay() {
+    let time =
+        (hr < 10 ? "0" + hr : hr) + ":" +
+        (min < 10 ? "0" + min : min) + ":" +
+        (sec < 10 ? "0" + sec : sec) + "." +
+        (ms < 10 ? "0" + ms : ms);
+
+    document.getElementById("display").innerText = time;
+}
 
 function start() {
-    if (!timer) {
-        timer = setInterval(run, 10);
-    }
+    interval = setInterval(() => {
+        ms++;
+        if (ms >= 100) { ms = 0; sec++; }
+        if (sec >= 60) { sec = 0; min++; }
+        if (min >= 60) { min = 0; hr++; }
+        updateDisplay();
+    }, 10);
 }
 
-function run() {
-    ms++;
-    if (ms === 100) { ms = 0; sec++; }
-    if (sec === 60) { sec = 0; min++; }
-
-    document.getElementById("display").textContent =
-        `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}:${String(ms).padStart(2,'0')}`;
-}
-
-function stop() {
-    clearInterval(timer);
-    timer = null;
-}
-
+function pause() { clearInterval(interval); }
 function reset() {
-    ms = sec = min = 0;
-    document.getElementById("display").textContent = "00:00:00";
+    clearInterval(interval);
+    ms = sec = min = hr = 0;
+    updateDisplay();
+    document.getElementById("laps").innerHTML = "";
+}
+
+function lap() {
+    let lapTime = document.createElement("div");
+    lapTime.className = "lap-item";
+    lapTime.innerText = document.getElementById("display").innerText;
+    document.getElementById("laps").appendChild(lapTime);
 }
 </script>
 
