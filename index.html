@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Clock with All Time Zones</title>
+    <title>Digital Clock with Searchable Time Zones</title>
+
     <style>
         body {
             background: #000;
@@ -25,25 +26,29 @@
             box-shadow: 0 0 20px #00ffcc;
         }
 
-        /* Settings button */
+        /* Settings icon button */
         .settings-btn {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: #00ffcc;
+            background: #00ff00;
             color: #000;
+            font-size: 22px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
             border: none;
-            padding: 10px 18px;
-            font-size: 16px;
-            border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px #00ff00;
         }
 
         /* Settings panel */
         .settings-panel {
             position: absolute;
-            top: 70px;
+            top: 80px;
             right: 20px;
             width: 260px;
             background: #111;
@@ -54,8 +59,10 @@
             color: #00ffcc;
             max-height: 350px;
             overflow-y: auto;
+            box-shadow: 0 0 15px #00ffcc;
         }
 
+        .settings-panel input,
         .settings-panel select {
             width: 100%;
             padding: 8px;
@@ -71,11 +78,15 @@
 </head>
 <body>
 
-    <button class="settings-btn" onclick="toggleSettings()">⚙ Settings</button>
+    <!-- Green circular icon -->
+    <button class="settings-btn" onclick="toggleSettings()">⚙</button>
 
     <div class="settings-panel" id="settingsPanel">
+        <label><b>Search Time Zone:</b></label>
+        <input type="text" id="timezoneSearch" placeholder="Type country (ex: I)" onkeyup="filterZones()">
+
         <label>Time Zone:</label>
-        <select id="timezoneSelect"></select>
+        <select id="timezoneSelect" size="8"></select>
 
         <label>Time Format:</label>
         <select id="formatSelect">
@@ -87,20 +98,20 @@
     <div class="clock" id="clock"></div>
 
     <script>
-        // Load all time zones automatically
+        let allZones = [];
+
         function loadTimeZones() {
             const tzSelect = document.getElementById("timezoneSelect");
 
-            // Add Local Time option
+            // Local Time option
             const localOption = document.createElement("option");
             localOption.value = "local";
             localOption.textContent = "Local Time";
             tzSelect.appendChild(localOption);
 
-            // Load all IANA time zones
-            const zones = Intl.supportedValuesOf("timeZone");
+            allZones = Intl.supportedValuesOf("timeZone");
 
-            zones.forEach(zone => {
+            allZones.forEach(zone => {
                 const opt = document.createElement("option");
                 opt.value = zone;
                 opt.textContent = zone;
@@ -109,6 +120,30 @@
         }
 
         loadTimeZones();
+
+        // Filter zones based on user input
+        function filterZones() {
+            const searchValue = document.getElementById("timezoneSearch").value.toLowerCase();
+            const tzSelect = document.getElementById("timezoneSelect");
+
+            tzSelect.innerHTML = ""; 
+
+            if ("local".includes(searchValue)) {
+                const localOption = document.createElement("option");
+                localOption.value = "local";
+                localOption.textContent = "Local Time";
+                tzSelect.appendChild(localOption);
+            }
+
+            allZones.forEach(zone => {
+                if (zone.toLowerCase().includes(searchValue)) {
+                    const opt = document.createElement("option");
+                    opt.value = zone;
+                    opt.textContent = zone;
+                    tzSelect.appendChild(opt);
+                }
+            });
+        }
 
         function toggleSettings() {
             const panel = document.getElementById("settingsPanel");
