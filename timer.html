@@ -1,67 +1,161 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Timer</title>
+    <title>Neon Timer</title>
     <style>
         body {
+            margin: 0;
+            height: 100vh;
             background: #000;
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
             color: #00ffcc;
-            font-family: Arial;
-            text-align: center;
-            margin-top: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        .container { text-align: center; }
+
         .time {
             font-size: 70px;
-            text-shadow: 0 0 20px #00ffcc;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 18px #00ffcc;
         }
-        button, input {
+
+        input {
+            width: 120px;
             padding: 10px;
+            font-size: 22px;
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+            background: #001010;
+            color: #00ffcc;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 12px 22px;
             margin: 10px;
+            background: #00ffcc22;
+            border: 2px solid #00ffcc;
+            color: #00ffcc;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
             background: #00ffcc;
-            border-radius: 8px;
-            border: none;
+            color: #000;
+            box-shadow: 0 0 18px #00ffcc;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #00ffcc;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 12px #00ffcc;
+        }
+
+        .back-btn svg {
+            width: 28px;
+            height: 28px;
+            stroke: #00ffcc;
+            fill: none;
+            stroke-width: 2;
         }
     </style>
 </head>
+
 <body>
 
-<h1>⏳ Timer</h1>
+<!-- Back Button -->
+<button class="back-btn" onclick="location.href='index.html'">
+    <svg viewBox="0 0 24 24">
+        <path d="M15 18l-6-6 6-6"/>
+    </svg>
+</button>
 
-<input id="minutes" type="number" placeholder="Enter minutes">
+<div class="container">
 
-<div class="time" id="display">00:00</div>
+    <div class="time" id="display">00:00:00</div>
 
-<button onclick="startTimer()">Start</button>
-<button onclick="stopTimer()">Stop</button>
-<button onclick="resetTimer()">Reset</button>
+    <input type="number" id="hours" placeholder="HH" min="0">
+    <input type="number" id="minutes" placeholder="MM" min="0" max="59">
+    <input type="number" id="seconds" placeholder="SS" min="0" max="59">
+
+    <br><br>
+
+    <button class="btn" onclick="startTimer()">Start</button>
+    <button class="btn" onclick="pauseTimer()">Pause</button>
+    <button class="btn" onclick="resetTimer()">Reset</button>
+</div>
+
+<audio id="alarmSound">
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
 
 <script>
+let totalSeconds = 0;
 let countdown;
 
+function updateDisplay() {
+    let h = Math.floor(totalSeconds / 3600);
+    let m = Math.floor((totalSeconds % 3600) / 60);
+    let s = totalSeconds % 60;
+
+    document.getElementById("display").innerText =
+        (h < 10 ? "0" + h : h) + ":" +
+        (m < 10 ? "0" + m : m) + ":" +
+        (s < 10 ? "0" + s : s);
+}
+
 function startTimer() {
-    let min = document.getElementById("minutes").value;
-    let sec = min * 60;
+    let h = parseInt(document.getElementById("hours").value) || 0;
+    let m = parseInt(document.getElementById("minutes").value) || 0;
+    let s = parseInt(document.getElementById("seconds").value) || 0;
 
+    totalSeconds = h * 3600 + m * 60 + s;
+
+    if (totalSeconds <= 0) return alert("Enter a valid time!");
+
+    clearInterval(countdown);
     countdown = setInterval(() => {
-        let m = Math.floor(sec / 60);
-        let s = sec % 60;
-
-        document.getElementById("display").textContent =
-            `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
-        if (sec === 0) clearInterval(countdown);
-        sec--;
+        if (totalSeconds <= 0) {
+            clearInterval(countdown);
+            document.getElementById("alarmSound").play();
+            return;
+        }
+        totalSeconds--;
+        updateDisplay();
     }, 1000);
 }
 
-function stopTimer() {
+function pauseTimer() {
     clearInterval(countdown);
 }
 
 function resetTimer() {
     clearInterval(countdown);
-    document.getElementById("display").textContent = "00:00";
+    totalSeconds = 0;
+    updateDisplay();
 }
+
+updateDisplay();
 </script>
 
 </body>
