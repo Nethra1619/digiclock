@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Style Digital Clock</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>System Style Digital Clock (Fixed IST)</title>
 
     <style>
         body {
             background: #000;
             color: #00ffcc;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -24,8 +25,16 @@
             border-radius: 15px;
             box-shadow: 0 0 20px #00ffcc;
             letter-spacing: 3px;
+            text-align: center;
         }
 
+        .tz-label {
+            margin-top: 10px;
+            color: #bfffdc;
+            font-size: 14px;
+        }
+
+        /* Green Icon */
         .settings-btn {
             position: absolute;
             top: 20px;
@@ -44,11 +53,12 @@
             box-shadow: 0 0 10px #00ff00;
         }
 
+        /* Settings Panel */
         .settings-panel {
             position: absolute;
             top: 80px;
             right: 20px;
-            width: 300px;
+            width: 320px;
             padding: 15px;
             background: #111;
             border: 2px solid #00ffcc;
@@ -57,47 +67,79 @@
             box-shadow: 0 0 15px #00ffcc;
         }
 
+        .settings-panel label {
+            display: block;
+            margin-bottom: 6px;
+            color: #9fffd8;
+            font-weight: 600;
+        }
+
+        .settings-panel input,
         .settings-panel select {
             width: 100%;
             padding: 8px;
-            margin-top: 8px;
+            margin-top: 4px;
+            margin-bottom: 12px;
             background: #222;
             color: #00ffcc;
             border: 1px solid #00ffcc;
             border-radius: 6px;
+            box-sizing: border-box;
         }
 
+        .settings-panel input[readonly] {
+            cursor: default;
+        }
+
+        .small-note {
+            font-size: 12px;
+            color: #88ffd1;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 420px) {
+            .clock { font-size: 48px; padding: 14px 20px; }
+            .settings-panel { width: 90%; right: 5%; }
+        }
     </style>
 </head>
 <body>
 
-    <button class="settings-btn" onclick="toggleSettings()">⚙</button>
+    <button class="settings-btn" onclick="toggleSettings()" title="Settings">⚙</button>
 
     <div class="settings-panel" id="settingsPanel">
+        <label>Time Zone (fixed)</label>
+        <input id="timezoneDisplay" type="text" readonly value="Asia/Kolkata — IST (Chennai / Kolkata / New Delhi)">
 
-        <label><b>Time Format:</b></label>
-        <select id="formatSelect">
+        <label>Time Format</label>
+        <select id="formatSelect" aria-label="Time format">
             <option value="24">24-Hour</option>
             <option value="12">12-Hour</option>
         </select>
 
+        <div class="small-note">Timezone is fixed to IST (UTC +05:30).</div>
     </div>
 
     <div class="clock" id="clock"></div>
+    <div class="tz-label" id="tzLabel">Timezone: Asia/Kolkata (IST)</div>
 
     <script>
+        // FIXED timezone constant
+        const FIXED_TZ = "Asia/Kolkata";
+
         function toggleSettings() {
             const panel = document.getElementById("settingsPanel");
             panel.style.display = panel.style.display === "block" ? "none" : "block";
         }
 
         function updateClock() {
-            const format = document.getElementById("formatSelect").value;
+            const format = document.getElementById("formatSelect").value || "24";
 
-            // FIXED TIMEZONE → IST (Chennai/Kolkata/New Delhi)
-            const tz = "Asia/Kolkata";
+            // Use fixed IST timezone
+            const tz = FIXED_TZ;
 
-            let now = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+            // Create the date in the target timezone
+            const now = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
 
             let h = now.getHours();
             let m = now.getMinutes();
@@ -114,8 +156,11 @@
             s = s < 10 ? "0" + s : s;
 
             document.getElementById("clock").textContent = `${h}:${m}:${s}${period}`;
+            // update small label (keeps visible)
+            document.getElementById("tzLabel").textContent = `Timezone: ${tz} (IST — UTC +05:30)`;
         }
 
+        // initialize: show IST in the readonly field (already set in value), start clock
         setInterval(updateClock, 1000);
         updateClock();
     </script>
