@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>System Style Digital Clock (Fixed IST)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Style Digital Clock</title>
 
     <style>
         body {
             background: #000;
             color: #00ffcc;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -25,32 +24,34 @@
             border-radius: 15px;
             box-shadow: 0 0 20px #00ffcc;
             letter-spacing: 3px;
-            text-align: center;
         }
 
-        .tz-label {
-            margin-top: 10px;
-            color: #bfffdc;
-            font-size: 14px;
-        }
-
-        /* Green Icon */
+        /* Neon Green Settings Icon (SVG) */
         .settings-btn {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: #00ff00;
-            color: #000;
+            background: transparent;
+            border: none;
             width: 45px;
             height: 45px;
-            font-size: 22px;
-            border-radius: 50%;
-            border: none;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .settings-btn svg {
+            width: 40px;
+            height: 40px;
+            fill: #00ffcc;
+            filter: drop-shadow(0 0 6px #00ffcc);
+            transition: 0.3s;
+        }
+
+        .settings-btn:hover svg {
+            transform: rotate(30deg);
+            filter: drop-shadow(0 0 10px #00ffcc);
         }
 
         /* Settings Panel */
@@ -58,74 +59,125 @@
             position: absolute;
             top: 80px;
             right: 20px;
-            width: 320px;
+            width: 300px;
             padding: 15px;
             background: #111;
             border: 2px solid #00ffcc;
             border-radius: 10px;
             display: none;
+            max-height: 380px;
+            overflow-y: auto;
             box-shadow: 0 0 15px #00ffcc;
-        }
-
-        .settings-panel label {
-            display: block;
-            margin-bottom: 6px;
-            color: #9fffd8;
-            font-weight: 600;
         }
 
         .settings-panel input,
         .settings-panel select {
             width: 100%;
             padding: 8px;
-            margin-top: 4px;
-            margin-bottom: 12px;
+            margin-top: 8px;
             background: #222;
             color: #00ffcc;
             border: 1px solid #00ffcc;
             border-radius: 6px;
-            box-sizing: border-box;
         }
 
-        .settings-panel input[readonly] {
-            cursor: default;
-        }
-
-        .small-note {
-            font-size: 12px;
-            color: #88ffd1;
-            margin-top: 6px;
-        }
-
-        @media (max-width: 420px) {
-            .clock { font-size: 48px; padding: 14px 20px; }
-            .settings-panel { width: 90%; right: 5%; }
+        optgroup {
+            color: #00ffaa;
+            font-weight: bold;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
 
-    <button class="settings-btn" onclick="toggleSettings()" title="Settings">⚙</button>
+    <!-- New Neon Settings Icon -->
+    <button class="settings-btn" onclick="toggleSettings()">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5zm7.43-2.93l1.79-1.38-1.12-2.79-2.17.17a6.99 6.99 0 0 0-1.21-.7l-.46-2.13-2.88-.5-.88 1.98a6.99 6.99 0 0 0-1.4 0L9.62 5.24l-2.88.5-.46 2.13c-.43.2-.83.44-1.21.7l-2.17-.17L1.78 9.2l1.79 1.38c-.05.23-.08.47-.08.72s.03.49.08.72l-1.79 1.38 1.12 2.79 2.17-.17c.38.26.78.5 1.21.7l.46 2.13 2.88.5.88-1.98c.46.05.94.05 1.4 0l.88 1.98 2.88-.5.46-2.13c.43-.2.83-.44 1.21-.7l2.17.17 1.12-2.79-1.79-1.38c.05-.23.08-.47.08-.72s-.03-.49-.08-.72z"/>
+        </svg>
+    </button>
 
     <div class="settings-panel" id="settingsPanel">
-        <label>Time Zone (fixed)</label>
-        <input id="timezoneDisplay" type="text" readonly value="Asia/Kolkata — IST (Chennai / Kolkata / New Delhi)">
 
-        <label>Time Format</label>
-        <select id="formatSelect" aria-label="Time format">
+        <label><b>Search Time Zone:</b></label>
+        <input type="text" id="timezoneSearch" placeholder="Search city or region..." onkeyup="filterZones()">
+
+        <label><b>Time Zone (System Style):</b></label>
+        <select id="timezoneSelect" size="10"></select>
+
+        <label><b>Time Format:</b></label>
+        <select id="formatSelect">
             <option value="24">24-Hour</option>
             <option value="12">12-Hour</option>
         </select>
 
-        <div class="small-note">Timezone is fixed to IST (UTC +05:30).</div>
     </div>
 
     <div class="clock" id="clock"></div>
-    <div class="tz-label" id="tzLabel">Timezone: Asia/Kolkata (IST)</div>
+
 
     <script>
-        // FIXED timezone constant
-        const FIXED_TZ = "Asia/Kolkata";
+        let groupedZones = {};
+        let flatZones = [];
+
+        function loadSystemTimeZones() {
+            const zones = Intl.supportedValuesOf("timeZone");
+
+            // ---- FORCE ADD INDIA ZONE ----
+            if (!zones.includes("Asia/Kolkata")) {
+                zones.push("Asia/Kolkata");
+            }
+
+            flatZones = zones;
+
+            groupedZones = {};
+
+            zones.forEach(zone => {
+                const [region, city] = zone.split("/");
+
+                if (!groupedZones[region]) {
+                    groupedZones[region] = [];
+                }
+
+                groupedZones[region].push(zone);
+            });
+
+            renderDropdown(zones);
+        }
+
+        function renderDropdown(list) {
+            const tzSelect = document.getElementById("timezoneSelect");
+            tzSelect.innerHTML = "";
+
+            for (let region in groupedZones) {
+                const optgroup = document.createElement("optgroup");
+                optgroup.label = region;
+
+                groupedZones[region]
+                    .filter(z => list.includes(z))
+                    .forEach(zone => {
+                        const opt = document.createElement("option");
+                        opt.value = zone;
+
+                        opt.textContent =
+                            zone === "Asia/Kolkata"
+                                ? "Asia → Kolkata (IST)"
+                                : zone.replace("/", " → ");
+
+                        optgroup.appendChild(opt);
+                    });
+
+                tzSelect.appendChild(optgroup);
+            }
+
+            document.getElementById("timezoneSelect").value = "Asia/Kolkata";
+        }
+
+        function filterZones() {
+            const text = document.getElementById("timezoneSearch").value.toLowerCase();
+            const filtered = flatZones.filter(z => z.toLowerCase().includes(text));
+            renderDropdown(filtered);
+        }
 
         function toggleSettings() {
             const panel = document.getElementById("settingsPanel");
@@ -133,13 +185,12 @@
         }
 
         function updateClock() {
-            const format = document.getElementById("formatSelect").value || "24";
+            const tz = document.getElementById("timezoneSelect").value;
+            const format = document.getElementById("formatSelect").value;
 
-            // Use fixed IST timezone
-            const tz = FIXED_TZ;
-
-            // Create the date in the target timezone
-            const now = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+            let now = tz
+                ? new Date(new Date().toLocaleString("en-US", { timeZone: tz }))
+                : new Date();
 
             let h = now.getHours();
             let m = now.getMinutes();
@@ -156,14 +207,13 @@
             s = s < 10 ? "0" + s : s;
 
             document.getElementById("clock").textContent = `${h}:${m}:${s}${period}`;
-            // update small label (keeps visible)
-            document.getElementById("tzLabel").textContent = `Timezone: ${tz} (IST — UTC +05:30)`;
         }
 
-        // initialize: show IST in the readonly field (already set in value), start clock
+        loadSystemTimeZones();
         setInterval(updateClock, 1000);
         updateClock();
     </script>
 
 </body>
 </html>
+
