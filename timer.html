@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Timer</title>
+    <style>
+        body {
+            background: #000;
+            color: #00ffcc;
+            font-family: Arial;
+            text-align: center;
+            margin-top: 100px;
+        }
+        .time {
+            font-size: 70px;
+            text-shadow: 0 0 20px #00ffcc;
+        }
+        button, input {
+            padding: 10px;
+            margin: 10px;
+            background: #00ffcc;
+            border-radius: 8px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>⏳ Timer</h1>
+
+<input id="minutes" type="number" placeholder="Enter minutes">
+
+<div class="time" id="display">00:00</div>
+
+<button onclick="startTimer()">Start</button>
+<button onclick="stopTimer()">Stop</button>
+<button onclick="resetTimer()">Reset</button>
+
+<script>
+let countdown;
+
+function startTimer() {
+    let min = document.getElementById("minutes").value;
+    let sec = min * 60;
+
+    countdown = setInterval(() => {
+        let m = Math.floor(sec / 60);
+        let s = sec % 60;
+
+        document.getElementById("display").textContent =
+            `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+        if (sec === 0) clearInterval(countdown);
+        sec--;
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(countdown);
+}
+
+function resetTimer() {
+    clearInterval(countdown);
+    document.getElementById("display").textContent = "00:00";
+}
+</script>
+
+</body>
+</html>
