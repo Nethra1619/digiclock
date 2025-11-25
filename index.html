@@ -26,32 +26,27 @@
             letter-spacing: 3px;
         }
 
-        /* Neon Green Settings Icon (SVG) */
+        /* Settings Button */
         .settings-btn {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: transparent;
-            border: none;
             width: 45px;
             height: 45px;
+            border-radius: 50%;
+            background: #00ff00;
+            border: none;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
+            box-shadow: 0 0 8px #00ff00;
         }
 
         .settings-btn svg {
-            width: 40px;
-            height: 40px;
-            fill: #00ffcc;
-            filter: drop-shadow(0 0 6px #00ffcc);
-            transition: 0.3s;
-        }
-
-        .settings-btn:hover svg {
-            transform: rotate(30deg);
-            filter: drop-shadow(0 0 10px #00ffcc);
+            width: 28px;
+            height: 28px;
+            fill: #000;
         }
 
         /* Settings Panel */
@@ -90,10 +85,9 @@
 </head>
 <body>
 
-    <!-- New Neon Settings Icon -->
     <button class="settings-btn" onclick="toggleSettings()">
         <svg viewBox="0 0 24 24">
-            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5zm7.43-2.93l1.79-1.38-1.12-2.79-2.17.17a6.99 6.99 0 0 0-1.21-.7l-.46-2.13-2.88-.5-.88 1.98a6.99 6.99 0 0 0-1.4 0L9.62 5.24l-2.88.5-.46 2.13c-.43.2-.83.44-1.21.7l-2.17-.17L1.78 9.2l1.79 1.38c-.05.23-.08.47-.08.72s.03.49.08.72l-1.79 1.38 1.12 2.79 2.17-.17c.38.26.78.5 1.21.7l.46 2.13 2.88.5.88-1.98c.46.05.94.05 1.4 0l.88 1.98 2.88-.5.46-2.13c.43-.2.83-.44 1.21-.7l2.17.17 1.12-2.79-1.79-1.38c.05-.23.08-.47.08-.72s-.03-.49-.08-.72z"/>
+            <path d="M12 8.5A3.5 3.5 0 1 1 8.5 12 3.5 3.5 0 0 1 12 8.5m0-6.5a1 1 0 0 1 1 1v1.07a8.14 8.14 0 0 1 2.12.88l.76-.76a1 1 0 0 1 1.41 0l1.42 1.42a1 1 0 0 1 0 1.41l-.76.76A8.14 8.14 0 0 1 20.93 11H22a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-1.07a8.14 8.14 0 0 1-.88 2.12l.76.76a1 1 0 0 1 0 1.41l-1.42 1.42a1 1 0 0 1-1.41 0l-.76-.76A8.14 8.14 0 0 1 13 20.93V22a1 1 0 0 1-2 0v-1.07a8.14 8.14 0 0 1-2.12-.88l-.76.76a1 1 0 0 1-1.41 0L3.29 19.39a1 1 0 0 1 0-1.41l.76-.76A8.14 8.14 0 0 1 4.07 15H3a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h1.07a8.14 8.14 0 0 1 .88-2.12l-.76-.76a1 1 0 0 1 0-1.41L5.61 3.29a1 1 0 0 1 1.41 0l.76.76A8.14 8.14 0 0 1 9 4.07V3a1 1 0 0 1 1-1z"/>
         </svg>
     </button>
 
@@ -102,7 +96,7 @@
         <label><b>Search Time Zone:</b></label>
         <input type="text" id="timezoneSearch" placeholder="Search city or region..." onkeyup="filterZones()">
 
-        <label><b>Time Zone (System Style):</b></label>
+        <label><b>Time Zone (UTC + City):</b></label>
         <select id="timezoneSelect" size="10"></select>
 
         <label><b>Time Format:</b></label>
@@ -115,30 +109,35 @@
 
     <div class="clock" id="clock"></div>
 
-
     <script>
         let groupedZones = {};
         let flatZones = [];
 
+        function getUTCOffset(timeZone) {
+            const now = new Date();
+            const utc = new Date(now.toLocaleString("en-US", { timeZone: "UTC" }));
+            const local = new Date(now.toLocaleString("en-US", { timeZone }));
+
+            let diff = (local - utc) / 3600000; 
+            let sign = diff >= 0 ? "+" : "-";
+            diff = Math.abs(diff);
+
+            let hours = Math.floor(diff);
+            let minutes = Math.round((diff - hours) * 60);
+
+            return `UTC${sign}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+        }
+
         function loadSystemTimeZones() {
             const zones = Intl.supportedValuesOf("timeZone");
-
-            // ---- FORCE ADD INDIA ZONE ----
-            if (!zones.includes("Asia/Kolkata")) {
-                zones.push("Asia/Kolkata");
-            }
-
             flatZones = zones;
 
             groupedZones = {};
 
             zones.forEach(zone => {
-                const [region, city] = zone.split("/");
+                const [region] = zone.split("/");
 
-                if (!groupedZones[region]) {
-                    groupedZones[region] = [];
-                }
-
+                if (!groupedZones[region]) groupedZones[region] = [];
                 groupedZones[region].push(zone);
             });
 
@@ -157,20 +156,16 @@
                     .filter(z => list.includes(z))
                     .forEach(zone => {
                         const opt = document.createElement("option");
-                        opt.value = zone;
+                        const offset = getUTCOffset(zone);
 
-                        opt.textContent =
-                            zone === "Asia/Kolkata"
-                                ? "Asia → Kolkata (IST)"
-                                : zone.replace("/", " → ");
+                        opt.value = zone;
+                        opt.textContent = `${offset} → ${zone.replace("/", " → ")}`;
 
                         optgroup.appendChild(opt);
                     });
 
                 tzSelect.appendChild(optgroup);
             }
-
-            document.getElementById("timezoneSelect").value = "Asia/Kolkata";
         }
 
         function filterZones() {
@@ -195,8 +190,8 @@
             let h = now.getHours();
             let m = now.getMinutes();
             let s = now.getSeconds();
-            let period = "";
 
+            let period = "";
             if (format === "12") {
                 period = h >= 12 ? " PM" : " AM";
                 h = h % 12 || 12;
@@ -216,4 +211,3 @@
 
 </body>
 </html>
-
